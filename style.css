@@ -144,6 +144,43 @@ input[type="checkbox"]{
     display: none;
 }
 
+.edit-button {
+    background: none;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-right: 16px; /* increased space */
+    margin-left: 8px;   /* add space from checkbox */
+    transition: 200ms ease;
+}
+
+.edit-button svg {
+    /* Match delete-button color */
+    fill: var(--secondary-color);
+    transition: 200ms ease;
+}
+
+.edit-button:hover svg {
+    fill: var(--accent-color);
+}
+
+.save-edit-button {
+    /* See inline style in JS for details */
+    margin-right: 8px; /* optional: space before delete button */
+}
+
+.edit-input {
+    /* See inline style in JS for details */
+    margin-right: 16px; /* space before delete button */
+    margin-left: 8px;   /* space after checkbox */
+}
+
+.edit-input:focus {
+    outline: none;
+}
+
 @media(max-width:500px){
     html{
         font-size: 12pt;
