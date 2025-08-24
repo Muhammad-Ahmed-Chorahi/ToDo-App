@@ -26,8 +26,23 @@ function addTodo() {
 
 function updateTodoList() {
   todoListUL.innerHTML = "";
-  allTodos.forEach((todo, todoIndex) => {
-    todoItem = createTodoItem(todo, todoIndex);
+  // Split todos into unchecked and checked
+  const unchecked = [];
+  const checked = [];
+  allTodos.forEach((todo, i) => {
+    if (todo.completed) {
+      checked.push({ ...todo, originalIndex: i });
+    } else {
+      unchecked.push({ ...todo, originalIndex: i });
+    }
+  });
+  // Render unchecked in original order, checked in most-recently-checked-first order
+  unchecked.forEach((todoObj) => {
+    todoItem = createTodoItem(todoObj, todoObj.originalIndex);
+    todoListUL.append(todoItem);
+  });
+  checked.forEach((todoObj) => {
+    todoItem = createTodoItem(todoObj, todoObj.originalIndex);
     todoListUL.append(todoItem);
   });
 }
@@ -52,11 +67,28 @@ function createTodoItem(todo, todoIndex) {
     deleteButton.addEventListener("click",()=>{
         deleteTodoItem(todoIndex);
     })
-    const checkbox=todoLI.querySelector("input");
-    checkbox.addEventListener("change", ()=>{
-        allTodos[todoIndex].completed=checkbox.checked;
-        saveTodos();
-    })
+    const checkbox = todoLI.querySelector("input");
+    checkbox.addEventListener("change", () => {
+    allTodos[todoIndex].completed = checkbox.checked;
+    if (checkbox.checked) {
+      // Move to top of checked group
+      const checkedTodos = allTodos.filter(t => t.completed && allTodos.indexOf(t) !== todoIndex);
+      const uncheckedTodos = allTodos.filter(t => !t.completed || allTodos.indexOf(t) === todoIndex);
+      // Remove from current position and add to front of checked group
+      const checkedTodo = allTodos[todoIndex];
+      allTodos = uncheckedTodos.filter((_, i) => i !== todoIndex)
+        .concat(checkedTodos);
+      allTodos.push(checkedTodo);
+    } else {
+      // Move to end of unchecked group
+      const uncheckedTodos = allTodos.filter(t => !t.completed && allTodos.indexOf(t) !== todoIndex);
+      const checkedTodos = allTodos.filter(t => t.completed);
+      const uncheckedTodo = allTodos[todoIndex];
+      allTodos = uncheckedTodos.concat([uncheckedTodo]).concat(checkedTodos);
+    }
+    saveTodos();
+    updateTodoList();
+  })
     checkbox.checked=todo.completed;
   return todoLI;
 }
